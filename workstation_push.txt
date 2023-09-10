@@ -1,1 +1,1 @@
-
+sudo salt-call --master --file-root=/srv/salt/ workstation.sls
