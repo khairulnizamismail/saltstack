@@ -1,27 +1,22 @@
 #top.sls
-
 base:
-  'host:workstation*':
-    - match: grain
-    - workstation
+  '*':
+    - common
 
-
-
-
+  'node_type:workstation':
+   - match: grain
+   - firefox
+   
+   
+   
 #workstation.sls
-
-#defiend OS
-{% set apvar = salt['grains.filter_by'] ( {
-  'Ubuntu': {'osver': 'ubuntu-14.04', 'pkgend': 'deb', 'pkginst': 'dpkg -i'},
-  'Ubuntu': {'osver': 'ubuntu-18.04', 'pkgend': 'deb', 'pkginst': 'dpkg -i'},
-}, default = 'Ubuntu') %}
-
-
-app:
-  file.managed:
-    - name: /home/nizam/workstation-{{ apvar.osver }}-x86_64.tar.gz
-    - source: salt://sw/workstation-{{ apvar.osver }}-x86_64.tar.gz
-
-  cmd.run:
-    - name: "cd /home/nizam; tar xvzf /home/nizam/workstation-{{ apvar.osver }}-x86_64.tar.gz; {{apvar.pkginst }} /home/nizam/workstation/*.{{ apvar.pkgend }}"
-    - creates: /usr/local/sbin/app
+{% set conf = salt['grains.filter_by']({
+  'Ubuntu18':  {
+    'source': 'salt://sw/firefox-89.0.tar.gz',
+    'use_path': '/etc/app',
+	},
+  'Ubuntu16': {
+    'source': 'salt://sw/firefox-85.0.tar.gz',
+    'use_path': '/etc/app',
+	},
+}, grain='os_family', merge=salt['pillar.get']('firefox:lookup')) %}
